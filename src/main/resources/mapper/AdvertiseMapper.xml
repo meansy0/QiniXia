@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mybatisplus.mapper.AdvertiseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.mybatisplus.model.domain.Advertise">
+        <result column="id" property="id" />
+        <result column="shopid" property="shopid" />
+    </resultMap>
+    <insert id="insertShopId">
+        insert into advertise (shopid)
+        values (#{shopIds})
+
+
+    </insert>
+    <delete id="deleteByShopId">
+        delete from advertise where shopid=#{deleteId}
+    </delete>
+    <select id="selectByShopId" resultType="com.example.mybatisplus.model.domain.Advertise">
+        select * from advertise where shopid=#{shopIds}
+    </select>
+    <select id="selectAll" resultType="com.example.mybatisplus.model.domain.Advertise">
+        select * from advertise
+    </select>
+
+
+</mapper>

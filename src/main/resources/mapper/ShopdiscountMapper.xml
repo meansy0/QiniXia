@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mybatisplus.mapper.ShopdiscountMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.mybatisplus.model.domain.Shopdiscount">
+        <id column="id" property="id" />
+        <result column="disvalue" property="disvalue" />
+        <result column="nowamout" property="nowamout" />
+        <result column="totalamout" property="totalamout" />
+        <result column="restriction" property="restriction" />
+        <result column="expirytime" property="expirytime" />
+        <result column="discharge" property="discharge" />
+    </resultMap>
+
+    <resultMap id="test" type="com.example.mybatisplus.model.domain.Shopdiscount" extends="BaseResultMap">
+        <collection property="uerShopdiscounts" ofType="com.example.mybatisplus.model.domain.Shopdiscount">
+            <id column="id" property="id" />
+            <result column="uer_id" property="uerId" />
+            <result column="shopdis_id" property="shopdisId" />
+            <result column="isuse" property="isuse" />
+        </collection>
+    </resultMap>
+    <insert id="insertShopDis">
+
+        insert into shopdiscount (disvalue,nowamout,totalamout,restriction,expirytime,discharge,shop_id)
+        values (#{disvalue},#{totalamout},#{totalamout},#{restriction},#{expirytime},#{discharge},#{shopId})
+
+    </insert>
+    <update id="updateamout">
+
+        update shopdiscount
+        SET nowamout=nowamout-1
+        where id=#{id}
+    </update>
+
+
+    <select id="ShopDisAll" resultType="com.example.mybatisplus.model.domain.Appdiscount">
+        select * from shopdiscount where expirytime &gt; now()
+    </select>
+
+
+    <select id="hasget1" resultType="com.example.mybatisplus.model.domain.Shopdiscount">
+        select a.id,u.uer_id, a.disvalue, nowamout,restriction,expirytime, discharge from uer_shopdiscount as u,shopdiscount as a
+        where u.uer_id=#{oid} and a.id=u.shopdis_id and expirytime &gt;= now() and shop_id=#{shopid} and isuse=false
+    </select>
+
+
+    <select id="getHasnot" resultType="com.example.mybatisplus.model.domain.Shopdiscount">
+
+         select * from shopdiscount where expirytime &gt;= now() and shop_id=#{shopid} and nowamout &gt; 0 and  not exists
+        (select null from uer_shopdiscount where shopdiscount.id=uer_shopdiscount.shopdis_id and uer_id=#{oid} and isuse=false)
+    </select>
+    <select id="hasget2" resultType="com.example.mybatisplus.model.domain.Shopdiscount">
+
+        select a.id,u.uer_id, a.disvalue, nowamout,restriction,expirytime, discharge from uer_shopdiscount as u,shopdiscount as a
+        where u.uer_id=#{oid} and a.id=#{id} and a.id=u.shopdis_id and expirytime &gt;= now()
+
+    </select>
+    <select id="getByShopId" resultType="com.example.mybatisplus.model.domain.Shopdiscount">
+
+                select * from shopdiscount where shop_id=#{shopId}
+    </select>
+
+
+</mapper>

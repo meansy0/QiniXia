@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mybatisplus.mapper.GoodsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.mybatisplus.model.domain.Goods">
+        <id column="id" property="id" />
+        <result column="shop_id" property="shopId" />
+        <result column="price" property="price" />
+        <result column="goodsintro" property="goodsintro" />
+        <result column="leftamout" property="leftamout" />
+        <result column="totalamout" property="totalamout" />
+        <result column="goodsname" property="goodsname" />
+        <result column="goodspic" property="goodspic" />
+    </resultMap>
+    <insert id="addCount">
+        update goods set leftamout = leftamout+#{amount}, totalamout=totalamout+#{amount} where id =#{goo_id}
+    </insert>
+    <update id="subCount">
+        update goods set leftamout = leftamout - #{amount} where id = #{goo_id};
+    </update>
+    <update id="deleteGoodsById">
+        update goods set leftamout=0,totalamout=0 where id=#{id}
+    </update>
+    <select id="selectByShopId" resultType="com.example.mybatisplus.model.domain.Goods">
+        select * from  goods where shop_id=#{id} and totalamout &gt; 0
+    </select>
+    <select id="getByShopId" resultType="com.example.mybatisplus.model.domain.Goods">
+        select goodsname,totalamout-leftamout as salesamout,leftamout,shop_id from goods where shop_id=#{shopid} and totalamout &gt; 0
+
+    </select>
+    <select id="queryCount" resultType="java.lang.Integer">
+        select leftamout from goods where id=#{goo_id} and totalamout &gt; 0
+    </select>
+    <select id="goodStat" resultType="com.example.mybatisplus.model.domain.goodsStat">
+        select goodsname, totalamout-leftamout as soldamount,goodspic,price from goods where shop_id=#{shopid} and totalamout &gt; 0
+    </select>
+    <select id="getInforById" resultType="com.example.mybatisplus.model.domain.Goods">
+         select id, shop_id,price,goodsintro,goodsname,totalamout-leftamout as salesamout,leftamout,goodspic from goods where id=#{id} and totalamout &gt; 0
+    </select>
+    <select id="selectByName" resultType="com.example.mybatisplus.model.domain.Goods">
+         SELECT * FROM goods WHERE totalamout &gt; 0 and (goodsname LIKE #{goodsname} or goodsintro LIKE #{goodsintro})
+
+
+    </select>
+    <select id="getSidByid" resultType="java.lang.Long">
+        select shop_id from goods
+        where id=#{goodsId}
+
+    </select>
+    <select id="selectHot10" resultType="com.example.mybatisplus.model.domain.Goods">
+        select id,price,goodsintro,goodspic,goodsname,totalamout-leftamout as salesamout,leftamout,shop_id  from goods order by totalamout-leftamout desc limit 0,3
+
+    </select>
+
+
+</mapper>

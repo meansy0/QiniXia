@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mybatisplus.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.mybatisplus.model.domain.User">
+        <id column="id" property="id" />
+        <result column="uremain" property="uremain" />
+        <result column="openid" property="openid" />
+    </resultMap>
+    <update id="sub">
+        update user set uremain = #{v} where openid = #{openId}
+    </update>
+    <update id="updateRemain">
+        update user
+        SET uremain=uremain+#{money}
+        where openid=#{openid}
+
+    </update>
+
+    <select id="getOpenid" resultMap="BaseResultMap">
+        select openid from user where openid= #{openid}
+    </select>
+    <select id="getUremainByOpenId" resultType="com.example.mybatisplus.model.domain.User">
+        select * from user where openid=#{openid}
+    </select>
+    <select id="getIdByOpenid" resultType="java.lang.Long">
+        select id from user where openid = #{openid}
+    </select>
+    <select id="getbyopenid" resultType="java.lang.String">
+        select id from user where openid=#{openid}
+    </select>
+    <select id="getRemainByOpenid" resultType="java.lang.Float">
+
+        select uremain from user where openid=#{openid}
+    </select>
+    <select id="selectCountUser" resultType="com.example.mybatisplus.model.domain.OrderStatistics">
+
+        SELECT
+        COUNT(IF( shop.shoptype="加油站",TRUE, NULL))AS gasStation,
+        COUNT(IF( shop.shoptype="住宿（酒店/民宿）",TRUE,NULL)) AS accommodation,
+        COUNT(IF(shop.shoptype="乡村美食",TRUE,NULL)) AS food,
+        COUNT(IF(shop.shoptype="购物",TRUE,NULL) ) AS shopping,
+        COUNT(IF(shop.shoptype="维修",TRUE,NULL)) AS repair,
+        COUNT(IF(shop.shoptype="村村互助",TRUE,NULL)) AS help,
+        COUNT(IF(shop.shoptype="农产品",TRUE,NULL )) AS agricultural,
+        SUM(price) as usermoney
+        FROM user_goods,goods,shop
+        where user_goods.user_id=#{id} and user_goods.goo_id=goods.id and goods.shop_id=shop.id
+
+    </select>
+
+
+</mapper>

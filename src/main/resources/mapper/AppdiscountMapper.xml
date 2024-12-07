@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mybatisplus.mapper.AppdiscountMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.mybatisplus.model.domain.Appdiscount">
+        <id column="id" property="id" />
+        <result column="disvalue" property="disvalue" />
+        <result column="nowamout" property="nowamout" />
+        <result column="totalamout" property="totalamout" />
+        <result column="restriction" property="restriction" />
+        <result column="expirytime" property="expirytime" />
+        <result column="discharge" property="discharge" />
+    </resultMap>
+
+    <resultMap id="test" type="com.example.mybatisplus.model.domain.Appdiscount" extends="BaseResultMap">
+        <collection property="userAppdiscounts" ofType="com.example.mybatisplus.model.domain.UserAppdiscount">
+            <id column="id" property="id" />
+            <result column="usei_id" property="useiId" />
+            <result column="appdis_id" property="appdisId" />
+            <result column="isuse" property="isuse" />
+        </collection>
+
+    </resultMap>
+    <insert id="insertAppDis">
+
+        insert into appdiscount (disvalue,nowamout,totalamout,restriction,expirytime,discharge)
+        values (#{disvalue},#{totalamout},#{totalamout},#{restriction},#{expirytime},#{discharge})
+
+    </insert>
+    <update id="updateAmout">
+
+        update appdiscount
+        SET nowamout=nowamout-1
+        where id=#{id}
+
+    </update>
+    <!--<update id="updateAmout">-->
+        <!--update appdiscount-->
+        <!--SET isuse=1-->
+        <!--where -->
+        <!---->
+    <!--</update>-->
+
+
+    <select id="hasget1" resultMap="test">
+        select a.id,u.usei_id, a.disvalue, nowamout,restriction,expirytime, discharge from user_appdiscount as u,appdiscount as a
+        where u.usei_id=#{opid} and a.id=u.appdis_id and expirytime &gt;= now() and isuse=false
+
+    </select>
+    <select id="getAllOut" resultType="com.example.mybatisplus.model.domain.Appdiscount">
+         select a.id,u.usei_id, a.disvalue, nowamout,restriction,expirytime, discharge from user_appdiscount as u,appdiscount as a
+        where u.usei_id=#{opid} and a.id=u.appdis_id and expirytime &lt; now() and isuse=false
+    </select>
+    <select id="getHasnot" resultType="com.example.mybatisplus.model.domain.Appdiscount">
+        select * from appdiscount where expirytime &gt;= now() and nowamout &gt; 0 and not exists
+        (select null from user_appdiscount where appdiscount.id=user_appdiscount.appdis_id and usei_id=#{opid} and isuse=false)
+    </select>
+    <select id="hasget2" resultType="com.example.mybatisplus.model.domain.Appdiscount">
+          select a.id,u.usei_id, a.disvalue, nowamout,restriction,expirytime, discharge from user_appdiscount as u,appdiscount as a
+        where u.usei_id=#{opid} and a.id=#{id} and a.id=u.appdis_id and expirytime &gt;= now()
+    </select>
+    <select id="getAppAll" resultType="com.example.mybatisplus.model.domain.Appdiscount">
+        select * from appdiscount
+    </select>
+
+
+</mapper>

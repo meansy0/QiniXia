@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mybatisplus.mapper.UerShopdiscountMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.mybatisplus.model.domain.UerShopdiscount">
+        <id column="id" property="id" />
+        <result column="uer_id" property="uerId" />
+        <result column="shopdis_id" property="shopdisId" />
+        <result column="isuse" property="isuse" />
+    </resultMap>
+    <insert id="insertUserDis">
+
+        insert into uer_shopdiscount (uer_id,shopdis_id,isuse)
+        values (#{oid},#{id},false)
+    </insert>
+    <update id="UpdateUseDis">
+        update uer_shopdiscount
+        SET isuse=true
+        where uer_id=#{UserId} and shopdis_id=#{DisId}
+    </update>
+
+</mapper>

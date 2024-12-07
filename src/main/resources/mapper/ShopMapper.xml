@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mybatisplus.mapper.ShopMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.mybatisplus.model.domain.Shop">
+        <id column="id" property="id" />
+        <result column="mgr_id" property="mgrId" />
+        <result column="shoptype" property="shoptype" />
+        <result column="shopadress" property="shopadress" />
+        <result column="shopintro" property="shopintro" />
+        <result column="ischeck" property="ischeck" />
+        <result column="shoppic" property="shoppic" />
+        <result column="shopname" property="shopname" />
+        <result column="checkadvice" property="checkadvice" />
+    </resultMap>
+
+    <resultMap id="test1" type="com.example.mybatisplus.model.domain.Shop" extends="BaseResultMap">
+        <association property="score" javaType="com.example.mybatisplus.model.domain.Score">
+            <result column="id" property="id" />
+            <result column="shopid" property="shopid" />
+            <result column="score" property="score" />
+        </association>
+    </resultMap>
+
+
+    <insert id="insertShopIntro">
+        insert into shop (shopname,shoptype,shopadress,shopintro,mgr_id,ischeck,shoppic)
+        values (#{name},#{type},#{address},#{intro},#{mid},false,#{picture})
+    </insert>
+
+    <update id="updateCheckAdvice">
+        update shop
+        SET checkadvice=#{advice}
+        where id=#{mid}
+
+    </update>
+    <update id="updateIsCheck">
+        update shop
+        SET ischeck=true
+        where id=#{mid}
+
+    </update>
+    <select id="getAll" resultMap="test1">
+        select shop.id,shopadress,shopname,shoppic,score , shopintro from shop ,score where shoptype=#{shoptype} and ischeck=1 and shop.id=shopid
+        order by score desc
+    </select>
+
+    <select id="getNotCheck" resultType="com.example.mybatisplus.model.domain.Shop">
+        select * from shop where ischeck=0
+
+    </select>
+    <select id="getByMid" resultType="com.example.mybatisplus.model.domain.Shop">
+        select * from shop where mgr_id=#{mid}
+
+    </select>
+    <select id="selectByShopId" resultType="com.example.mybatisplus.model.domain.Shop">
+        select id, shoppic,shopname from shop where ischeck=true and not exists (select null from advertise where shopid=shop.id)
+
+    </select>
+    <select id="selectByShopId2" resultType="com.example.mybatisplus.model.domain.Shop">
+        select id, shoppic,shopname from shop where ischeck=true and exists (select null from advertise where shopid=shop.id)
+
+    </select>
+    <select id="selectAllInfor" resultType="com.example.mybatisplus.model.domain.Shop">
+        select * from shop where exists(select null from advertise where shopid=shop.id)
+
+    </select>
+    <select id="selectMyCollect" resultType="com.example.mybatisplus.model.domain.Shop">
+        select * from shop where ischeck=true and exists (select null from favorite where shopid=shop.id and userid=#{userid})
+
+    </select>
+    <select id="selectShopid" resultType="java.lang.Long">
+        select id from shop where mgr_id=#{idReturn}
+
+    </select>
+    <select id="selectMid" resultType="java.lang.Long">
+        select mgr_id from shop where id=#{shopid}
+
+
+
+    </select>
+
+
+</mapper>

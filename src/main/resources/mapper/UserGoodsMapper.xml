@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mybatisplus.mapper.UserGoodsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.mybatisplus.model.domain.UserGoods">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="goo_id" property="gooId" />
+        <result column="otime" property="otime" />
+        <result column="payway" property="payway" />
+        <result column="isover" property="isover" />
+        <result column="isdiscount" property="isdiscount" />
+        <result column="shouldpay" property="shouldpay" />
+        <result column="actualpay" property="actualpay" />
+    </resultMap>
+    <resultMap id="MyMap" type="com.example.mybatisplus.model.domain.UserGoods" extends="BaseResultMap">
+        <association property="goods" javaType="com.example.mybatisplus.model.domain.Goods">
+            <result column="gid" property="id"/>
+            <result column="goodsname" property="goodsname"/>
+            <result column="goodspic" property="goodspic"/>
+        </association>
+    </resultMap>
+    <resultMap id="StatMap" type="com.example.mybatisplus.model.domain.userStat">
+        <result column="num" property="num"/>
+        <result column="user_num" property="user_num"/>
+    </resultMap>
+    <update id="finishOrder">
+        update user_goods set isover = true where id=#{id}
+    </update>
+    <update id="setStatus">
+        update user_goods set payway = #{payway} where id = #{orderId}
+    </update>
+    <select id="selectOrder" resultMap="MyMap">
+        select user_id , goo_id , user_goods.id ,otime, payway, isover, isdiscount, shouldpay, actualpay,goodsname,goodspic from goods,user_goods where user_goods.goo_id = goods.id  and user_goods.id=#{id}
+    </select>
+    <select id="queryIf" resultType="com.example.mybatisplus.model.domain.UserGoods">
+        select * from user_goods where id=#{id}
+    </select>
+    <select id="queryOrder" resultMap="MyMap">
+        select user_id , goo_id , user_goods.id ,otime, payway, isover, isdiscount, shouldpay, actualpay,goodsname,goodspic from goods,user_goods where user_goods.goo_id = goods.id and user_goods.user_id=#{id} and isover=false
+    </select>
+
+    <select id="count" resultMap="StatMap">
+        SELECT elt(
+        INTERVAL(a.num, 0, 5, 10, 50, 100),
+         '1', '2', '3', '4', '5')
+        as num, count(user_id) as user_num
+        FROM (select count(*) as num,user_id from user_goods group by user_id ) as a
+        GROUP BY elt(
+        INTERVAL(a.num, 0, 5, 10, 50, 100),
+         '1', '2', '30', '4', '5')
+        order by num asc
+    </select>
+    <select id="countShopUser" resultMap="StatMap">
+        SELECT elt(
+        INTERVAL(a.num, 0, 1,5, 10),
+         '1.one', '2.1to5', '3.5to10', '4.morethan10')
+        as num, count(user_id) as user_num
+        FROM (select count(*) as num,user_id from user_goods,goods where goods.shop_id=#{shopid} and user_goods.goo_id = goods.id group by user_id ) as a
+        GROUP BY elt(
+        INTERVAL(a.num, 0, 1,5, 10),
+         '1.one', '2.1to5', '3.5to10', '4.morethan10')
+        order by user_num desc
+    </select>
+    <select id="queryShop" resultMap="MyMap">
+        select user_id , goo_id , user_goods.id ,otime, payway, isover, isdiscount, shouldpay, actualpay,goodsname,goodspic from user_goods,goods where user_goods.goo_id = goods.id and goods.shop_id=#{shopId}
+    </select>
+    <select id="queryAllIncome" resultType="java.lang.Float">
+    select sum(actualpay) from user_goods,shop,goods where shop_id = #{shop_id} and goo_id = goods.id and goods.shop_id =shop.id
+</select>
+    <select id="queryMonthIncome" resultType="java.lang.Float">
+    select sum(actualpay) from user_goods,shop,goods where shop_id = #{shopId} and otime &gt; (DATE_ADD(now(),INTERVAL -1 MONTH)) and goo_id = goods.id and goods.shop_id =shop.id
+</select>
+    <select id="queryYearIncome" resultType="java.lang.Float">
+    select sum(actualpay) from user_goods,shop,goods where shop_id = #{shopId} and otime &gt; (DATE_ADD(now(),INTERVAL -1 YEAR)) and goo_id = goods.id and goods.shop_id =shop.id
+</select>
+    <select id="incomeRank" resultType="java.lang.Float">
+    select sum(actualpay) from user_goods,shop,goods where goo_id = goods.id and goods.shop_id =shop.id group by shop.id order by sum(actualpay) desc
+</select>
+    <select id="getGidByid" resultType="java.lang.Long">
+        select goo_id from user_goods where id=#{id}
+
+    </select>
+    <select id="queryFinishOrder" resultType="com.example.mybatisplus.model.domain.UserGoods">
+        select user_id , goo_id , user_goods.id ,otime, payway, isover, isdiscount, shouldpay, actualpay,goodsname,goodspic
+        from goods,user_goods
+        where user_goods.goo_id = goods.id and user_goods.user_id=#{id} and isover=true
+
+    </select>
+    <select id="queryFinishList" resultType="com.example.mybatisplus.model.domain.Indent">
+        select user_id , goo_id , user_goods.id ,otime, payway, isover, isdiscount, shouldpay, actualpay,goodsname,goodspic,score
+        from goods,user_goods,gscore
+        where user_goods.goo_id = goods.id and user_goods.user_id=#{id} and isover=true and gscore.gid=user_goods.id
+    </select>
+
+</mapper>
+
